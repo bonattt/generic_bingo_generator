@@ -1,0 +1,34 @@
+{
+  "billionaire": {
+    "extends": "people",
+    "dictionary": [
+      "Elon Musk",
+      "Mark Zuckerberg",
+      "Geoff Bezos",
+      "Bill Gates"
+    ]
+  },
+  "politician": {
+    "extends": "people",
+    "dictionary": []
+  },
+  "chinese_politicians": {
+    "extends": ["people", "politician"],
+    "dictionary": [
+      "Xi Jing Ping"
+    ]
+  },
+  "us_politician": {
+    "extends": ["people", "politician"],
+    "dictionary": [
+      "Joe Biden",
+      "Donald Trump"
+    ]
+  },
+  "people": {
+    "extends": null,
+    "dictionary": [
+      "Taylor Swift"
+    ]
+  }
+}

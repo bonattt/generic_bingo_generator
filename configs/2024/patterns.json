@@ -1,0 +1,12 @@
+{
+  "patterns": {
+    "free_space": "%(free_space)s (free space)",
+    "anticipated_events": "%(anticipated_event)s",
+    "conspiracy_theory": "%(conspiracy_theory)s"
+  },
+  "weights": {
+    "free_space": 1,
+    "anticipated_events": 19,
+    "conspiracy_theory": 5
+  }
+}
