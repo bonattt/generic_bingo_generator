@@ -7,12 +7,16 @@ PATTERNS = "patterns.json"
 DEFAULT_NAME = "2024"
 
 
+class BingoError(Exception):
+    pass
+
+
 class Patterns:
 
     DEFAULT_WEIGHT = 1
 
     def __init__(self, config_name: str):
-        with open(config_path(config_name, VOCABULARY), "r") as f:
+        with open(config_path(config_name, PATTERNS), "r") as f:
             self.json_data = json.loads(f.read())
 
     @property
@@ -25,7 +29,7 @@ class Patterns:
 
     def get_total_weights(self):
         total = 0
-        for _, weight in self.weights:
+        for _, weight in self.weights.items():
             total += weight
         return total
 
@@ -42,14 +46,14 @@ class Patterns:
         """
         multiplier = 1
         # TODO --- better maths here
-        total_weights = self.get_total_weights()  #
-        while self.get_total_weights * multiplier > n:
+        total = self.get_total_weights()
+        while total * multiplier > n:
             multiplier += 1
 
         result = []
         for key, pattern in self.patterns.items():
             for _ in range(self.get_weight(key) * multiplier):
-                result.add(pattern)
+                result.append(pattern)
         return result
 
     def select_patters(self, n):
@@ -102,9 +106,63 @@ class Vocabulary:
         self.json_data = self.load_vocabulary(config_name)
 
     def render_pattern_set(self, pattern_choices: list[str]) -> list[str]:
-        n = len(pattern_choices)
+        # n = len(pattern_choices)
+        word_query_count = self.get_word_query_count(pattern_choices)
+        word_query_results = self.query_words(word_query_count)
+        results = []
+        for pattern in pattern_choices:
+            category_list = self.get_choice_categories(pattern)
+            choices = {}
+            for c in category_list:
+                if c in choices:
+                    print("ERROR: duplicate catagory!!")
+                choices[c] = word_query_results[c].pop()
+            results.append(pattern % choices)
+        return results  # TODO ---
 
-        return  # TODO ---
+    def get_choice_categories(self, pattern: str) -> list[str]:
+        result = []
+        for item in pattern.split("%")[1:]:
+            if not item.startswith("(") and item.endswith(")s"):
+                print(f"ERROR: {item}")
+                continue
+            i = item.index(")s")
+            category = item[1:i]
+            result.append(category)
+        return result
+
+
+    def get_word_query_count(self, pattern_choices: list[str]) -> list[str]:
+        # print("pattern_choices:", pattern_choices)
+        all_str = "---".join(pattern_choices)
+        # print("all_str:", all_str)
+        print("split:", all_str.split("%("))
+        print("=" * 25)
+        word_queries = {}
+        for s in all_str.split("%"):
+            if not s.startswith("("):
+                # not an actual choice
+                continue
+            i = s.index(")s")
+            choice_category = s[1:i]
+            if choice_category in word_queries:
+                word_queries[choice_category] += 1
+            else:
+                word_queries[choice_category] = 1
+        return word_queries
+
+    def query_words(self, word_query_count) -> dict[str, list[str]]:
+        result = {}
+        for category, count in word_query_count.items():
+            try:
+                target_vocab = list(self.json_data[category])
+                while len(target_vocab) < count:
+                    target_vocab = target_vocab + list(self.json_data[category])
+                result[category] = random.sample(target_vocab, count)
+            except KeyError:
+                raise BingoError(f"missing category '{category}'")
+
+        return result
 
 
 def config_path(config_name: str, file_name: str) -> str:
@@ -114,13 +172,26 @@ def config_path(config_name: str, file_name: str) -> str:
 def build_tileset(patterns: Patterns, vocab: Vocabulary, n=25) -> list[str]:
     pattern_choices = patterns.select_patters(n)
     rendered_patterns = vocab.render_pattern_set(pattern_choices)
+    return rendered_patterns
+
+
+def cmd_print_bingo(bingo_tiles: list[str]):
+    """
+    prints a bingo board to stdout
+    """
+
 
 
 
 
 def main():
-    print("vocab:", Vocabulary(DEFAULT_NAME).json_data)
-    print("patterns:", Patterns(DEFAULT_NAME).json_data)
+    vocab = Vocabulary(DEFAULT_NAME)
+    pattern = Patterns(DEFAULT_NAME)
+    # print("vocab:", vocab.json_data)
+    # print("=" * 25)
+    # print("patterns:", pattern.json_data)
+    # print("=" * 25)
+    print("result:", build_tileset(pattern, vocab))
 
 
 if __name__ == "__main__":

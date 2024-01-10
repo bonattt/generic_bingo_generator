@@ -30,5 +30,51 @@
     "dictionary": [
       "Taylor Swift"
     ]
+  },
+  "conspiracy_theory": {
+    "dictionary": [
+      "Elite satanic cult",
+      "Feds caught orchestrating a terror event",
+      "Aliens"
+    ]
+  },
+  "anticipated_event": {
+    "dictionary": [
+      "Covid 24",
+      "Lockdown",
+      "Trump wins 2024",
+      "Biden wins 2024",
+      "Trump loses republican primary",
+      "Tim Pool's Civil War(tm)",
+      "Race Riots",
+      "Hunter Biden goes to jail",
+      "Hunter Biden goes free",
+      "Half Life 3 release date",
+      "Hollow Knight: silksong released",
+      "Covid Lab Leak \"conspiracy theory\" confirmed",
+      "Ukraine War Ends",
+      "Aliens",
+      "Gay sex tap in US federal government offices (for the third time)",
+      "The new Disney film bombs",
+      "Nuclear Detonation",
+      "A new streaming service is announced",
+      "Stock Market Crash",
+      "Elon Musk and Zuckerberg fight"
+    ]
+  },
+  "free_space": {
+    "dictionary": [
+      "US Border crisis",
+      "Inflationt",
+      "Opiod epidemic",
+      "Trump wins republican primary",
+      "Biden is Senile",
+      "Janurary 6th",
+      "Civil unrest over 2024 election results",
+      "Accusations of voter fraud in 2024",
+      "2024 election was \"stolen\"",
+      "Lawsuit over 2024 election",
+      "Taylor Swift Breakup"
+    ]
   }
 }
