@@ -5,7 +5,7 @@
     "conspiracy_theory": "%(conspiracy_theory)s"
   },
   "weights": {
-    "free_space": 1,
+    "free_space": 0,
     "anticipated_events": 19,
     "conspiracy_theory": 5
   }

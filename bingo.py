@@ -28,6 +28,10 @@ class Patterns:
     def weights(self):
         return self.json_data.get("weights")
 
+    @property
+    def free_space(self):
+        return self.patterns["free_space"]
+
     def get_total_weights(self):
         total = 0
         for _, weight in self.weights.items():
@@ -121,6 +125,10 @@ class Vocabulary:
             results.append(pattern % choices)
         return results  # TODO ---
 
+    def render_single_pattern(self, pattern: str):
+        result = self.render_pattern_set([pattern])
+        return result[0]
+
     def get_choice_categories(self, pattern: str) -> list[str]:
         result = []
         for item in pattern.split("%")[1:]:
@@ -187,10 +195,42 @@ def generate_default_bingo_board(n=5):
 def generate_bingo_board(
         patterns: Patterns,
         vocab: Vocabulary,
-        n=5
+        n=5,
+        free_space=True,
 ) -> list[list[str]]:
-    tileset = build_tileset(patterns, vocab, n**2)
+    n_tiles = n**2
+    if free_space:
+        n_tiles -= 1
+    tileset = build_tileset(patterns, vocab, n_tiles)
+
+    if free_space:
+        center = len(tileset) / 2
+        insert_at(
+            tileset,
+            vocab.render_single_pattern(patterns.free_space),
+            center,
+        )
     return compose_bingo_board(tileset, n)
+
+
+def insert_at(data: list, item, index: int):
+    """
+    Takes a list, an insex, and a item to be added to the list.
+    Adds the item to the list at the given index, pushing each
+    element of the list at or after that index forward one spot.
+    """
+    if not isinstance(index, int):
+        index = int(index)
+    current = item
+    next = item
+    breakpoint()
+    for i in range(index, len(data), 1):
+        next = data[i]
+        data[i] = current
+        current = next
+    data.append(next)
+
+
 
 
 def compose_bingo_board(tileset: list[str], n) -> list[list[str]]:
