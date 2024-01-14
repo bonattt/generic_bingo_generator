@@ -5,6 +5,7 @@ import random
 VOCABULARY = "vocabulary.json"
 PATTERNS = "patterns.json"
 DEFAULT_NAME = "2024"
+CONFIG_PATH = "bingo_configs"
 
 
 class BingoError(Exception):
@@ -133,11 +134,7 @@ class Vocabulary:
 
 
     def get_word_query_count(self, pattern_choices: list[str]) -> list[str]:
-        # print("pattern_choices:", pattern_choices)
         all_str = "---".join(pattern_choices)
-        # print("all_str:", all_str)
-        print("split:", all_str.split("%("))
-        print("=" * 25)
         word_queries = {}
         for s in all_str.split("%"):
             if not s.startswith("("):
@@ -166,7 +163,7 @@ class Vocabulary:
 
 
 def config_path(config_name: str, file_name: str) -> str:
-    return path.join("configs", config_name, file_name)
+    return path.join(CONFIG_PATH, config_name, file_name)
 
 
 def build_tileset(patterns: Patterns, vocab: Vocabulary, n=25) -> list[str]:
@@ -175,23 +172,76 @@ def build_tileset(patterns: Patterns, vocab: Vocabulary, n=25) -> list[str]:
     return rendered_patterns
 
 
-def cmd_print_bingo(bingo_tiles: list[str]):
+def generate_default_tileset(n=25):
+    vocab = Vocabulary(DEFAULT_NAME)
+    patterns = Patterns(DEFAULT_NAME)
+    return build_tileset(patterns, vocab, n)
+
+
+def generate_default_bingo_board(n=5):
+    vocab = Vocabulary(DEFAULT_NAME)
+    patterns = Patterns(DEFAULT_NAME)
+    return generate_bingo_board(patterns, vocab, n)
+
+
+def generate_bingo_board(
+        patterns: Patterns,
+        vocab: Vocabulary,
+        n=5
+) -> list[list[str]]:
+    tileset = build_tileset(patterns, vocab, n**2)
+    return compose_bingo_board(tileset, n)
+
+
+def compose_bingo_board(tileset: list[str], n) -> list[list[str]]:
+    board = []
+    col_number = 0
+    row_number = 0
+    for tile in tileset:
+        if col_number == n:
+            col_number = 0
+            row_number += 1
+
+        if col_number == 0:
+            board.append([])
+
+        board[row_number].append(tile)
+        col_number += 1
+    return board
+
+
+
+def cmd_bingo(n=5) -> str:
     """
-    prints a bingo board to stdout
+    returns a string of a bingo board to as a string
+    bingo board is a square of length N tiles
     """
+    bingo_board = generate_default_tileset(n**2)
+    max_len = get_max_length(bingo_board)
+    output = ""
+    tile_count = 0
+    line_divider_length = ((max_len + 1) * n)
+    for word in bingo_board:
+        if tile_count == n:
+            tile_count = 0
+            output += "|\n" + ("-" * line_divider_length) + "\n|"
+        else:
+            tile_count += 1
 
+        adjusted_word = ("{:<%d}" % max_len).format(word)
+        output += adjusted_word
+    return output
 
-
+def get_max_length(bingo_board: list[str]) -> int:
+    """
+    Takes a list of strings, and returns the max string length of
+    any string in the list.
+    """
+    return max([len(s) for s in bingo_board])
 
 
 def main():
-    vocab = Vocabulary(DEFAULT_NAME)
-    pattern = Patterns(DEFAULT_NAME)
-    # print("vocab:", vocab.json_data)
-    # print("=" * 25)
-    # print("patterns:", pattern.json_data)
-    # print("=" * 25)
-    print("result:", build_tileset(pattern, vocab))
+    print(generate_default_bingo_board())
 
 
 if __name__ == "__main__":
